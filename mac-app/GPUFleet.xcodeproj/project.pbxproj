@@ -1,0 +1,182 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 60;
+	objects = {
+
+		A10000000000000000000001 /* GPUFleetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* GPUFleetApp.swift */; };
+		A10000000000000000000002 /* gpu_watch.py in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* gpu_watch.py */; };
+		A10000000000000000000003 /* GPUFleet.icns in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* GPUFleet.icns */; };
+
+		A20000000000000000000001 /* GPUFleetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPUFleetApp.swift; sourceTree = "<group>"; };
+		A20000000000000000000002 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A20000000000000000000003 /* gpu_watch.py */ = {isa = PBXFileReference; lastKnownFileType = text; path = ../gpu_watch.py; sourceTree = "<group>"; };
+		A20000000000000000000004 /* GPU Fleet Monitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GPU Fleet Monitor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000005 /* GPUFleet.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = GPUFleet.icns; sourceTree = "<group>"; };
+
+		A30000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000001 /* GPUFleetApp.swift */,
+				A20000000000000000000002 /* Info.plist */,
+				A20000000000000000000003 /* gpu_watch.py */,
+				A30000000000000000000003 /* Resources */,
+				A30000000000000000000002 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A30000000000000000000003 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000005 /* GPUFleet.icns */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A30000000000000000000002 /* Products */ = {
+			isa = PBXGroup;
+			children = (A20000000000000000000004 /* GPU Fleet Monitor.app */, );
+			name = Products;
+			sourceTree = "<group>";
+		};
+
+		A40000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (A10000000000000000000001 /* GPUFleetApp.swift in Sources */, );
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A40000000000000000000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A40000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000002 /* gpu_watch.py in Resources */,
+				A10000000000000000000003 /* GPUFleet.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+		A50000000000000000000001 /* GPUFleetMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A70000000000000000000002 /* Build configuration list for PBXNativeTarget "GPUFleetMonitor" */;
+			buildPhases = (
+				A40000000000000000000001 /* Sources */,
+				A40000000000000000000002 /* Frameworks */,
+				A40000000000000000000003 /* Resources */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = GPUFleetMonitor;
+			productName = "GPU Fleet Monitor";
+			productReference = A20000000000000000000004 /* GPU Fleet Monitor.app */;
+			productType = "com.apple.product-type.application";
+		};
+
+		A50000000000000000000002 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					A50000000000000000000001 = {CreatedOnToolsVersion = 26.6; ProvisioningStyle = Manual; };
+				};
+			};
+			buildConfigurationList = A70000000000000000000001 /* Build configuration list for PBXProject "GPUFleetMonitor" */;
+			compatibilityVersion = "Xcode 15.0";
+			developmentRegion = zh_CN;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base, zh_CN, );
+			mainGroup = A30000000000000000000001;
+			productRefGroup = A30000000000000000000002 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (A50000000000000000000001 /* GPUFleetMonitor */, );
+		};
+
+		A60000000000000000000001 /* Debug project settings */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A60000000000000000000002 /* Release project settings */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A60000000000000000000003 /* Debug target settings */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				ENABLE_APP_SANDBOX = NO;
+				EXECUTABLE_NAME = GPUFleet;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.codex.gpufleetmonitor;
+				PRODUCT_NAME = "GPU Fleet Monitor";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A60000000000000000000004 /* Release target settings */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				ENABLE_APP_SANDBOX = NO;
+				EXECUTABLE_NAME = GPUFleet;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = local.codex.gpufleetmonitor;
+				PRODUCT_NAME = "GPU Fleet Monitor";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+
+		A70000000000000000000001 /* Build configuration list for PBXProject "GPUFleetMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A60000000000000000000001 /* Debug project settings */,
+				A60000000000000000000002 /* Release project settings */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A70000000000000000000002 /* Build configuration list for PBXNativeTarget "GPUFleetMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A60000000000000000000003 /* Debug target settings */,
+				A60000000000000000000004 /* Release target settings */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+	};
+	rootObject = A50000000000000000000002 /* Project object */;
+}
