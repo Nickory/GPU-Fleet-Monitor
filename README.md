@@ -1,93 +1,103 @@
 # GPU Fleet Monitor
 
-> **一台服务器时，`nvitop` 就够了。GPU 一旦散落到不同服务器、不同节点——你打算开几个 SSH 窗口来回巡逻？**
+> **EN:** One server? nvitop is great. GPUs scattered across nodes? How many SSH windows are you going to patrol?
+>
+> **中文：** 单台服务器用 nvitop 就够了。GPU 分散到不同节点？你打算开几个 SSH 窗口来回巡逻？
 
-![GPU 分散在不同节点，开发者在多个屏幕间疲于奔命；统一监控后，一屏看全机群](docs/images/multi-server-motivation.jpg)
+![A developer juggling several isolated GPU servers before bringing them together in one fleet dashboard](docs/images/multi-server-motivation.jpg)
 
-## 为什么要做
+## Why Multi-Node Monitoring? / 为什么需要多节点监控？
 
-`nvitop` 很适合看**当前这台机器**。但训练任务常常分散在几台服务器上：A 机器空着几张卡，B 机器正在满载，C 机器又跑着另一批进程。每台机器各开一个终端，就得反复 SSH、切窗口、对照 GPU 编号——最后最忙的可能不是 GPU，而是盯屏幕的人。
+**The problem.** nvitop is excellent for the machine you are logged into. Training jobs, however, often spread across several servers: a few GPUs may be idle on host A, host B may be saturated, and host C may be running another set of processes. Checking each one means repeated SSH sessions, window switching, and mentally matching GPU numbers. At some point, the busiest part of the cluster is the person watching it.
 
-这个项目把视角从“单台服务器”扩展到“整组服务器”：在自己的 Mac 或终端配置多台主机，一次并行采集，再把所有 GPU 和进程收进同一个紧凑界面。任务继续留在原服务器上运行，不需要把机器凑到同一个节点，也不需要额外部署中心服务。
+**问题。** nvitop 很适合查看当前登录的服务器。但训练任务往往分散在多台机器上：A 机器有几张空闲卡，B 机器已经满载，C 机器又跑着另一批进程。逐台查看就得反复 SSH、切窗口、对照 GPU 编号——忙得最厉害的可能不是 GPU，而是盯屏幕的人。
 
-## 怎么解决
+**The idea.** Configure the hosts on your Mac or in the terminal, collect them in parallel, and view every GPU and process in one compact dashboard. Jobs stay on their original servers. The machines do not need to move to one node, and no central service is required.
 
-- **一屏看多台**：按服务器分组展示 GPU，每张卡一行；所有服务器的进程汇总到底部统一列表。
-- **继续用熟悉的 nvitop 风格**：显示利用率、显存、温度、功耗和进程；当前用户进程高亮，其他用户置灰。
-- **尽量少改服务器**：通过系统 SSH 并行只读采集；远端有 `nvitop` 时优先使用，没有时回退到 `nvidia-smi`。
-- **Mac 上管理连接**：图形界面可编辑、筛选服务器并选择刷新频率，也可查看连接诊断、空闲提醒和历史曲线。
+**解决思路。** 在 Mac 图形界面或终端里配置多台主机，并行采集后在一个紧凑界面里查看所有 GPU 和进程。任务继续留在原服务器上运行，不必迁到同一个节点，也不需要额外部署中心服务。
 
-简单说：GPU 可以各自在不同节点上忙，监控界面不用跟着分家。少开几个终端，也少练一点“窗口切换竞速”。
+## Features
 
-终端使用 Python `curses` 绘制紧凑表格，布局参考 `nvitop -m full`：GPU 区在上，统一进程表固定在底部，负载和显存使用颜色条。默认每 2 秒刷新，支持最低 0.25 秒高刷新。GPU 行整行按利用率（10%/75%）与显存占用率（10%/80%）的较高负载等级着色；GPU 与 MEM 色条分别按各自指标着色。
+- **One fleet view:** GPUs are grouped by server, with one row per GPU and a unified process table at the bottom.
+- **Familiar nvitop-style details:** utilization, VRAM, temperature, power, and processes; your processes are highlighted while other users' rows are dimmed.
+- **Minimal server setup:** parallel, read-only collection over system SSH. The monitor uses the remote nvitop Python API when available and falls back to structured nvidia-smi queries when it is not.
+- **A native macOS GUI:** edit and filter hosts, choose the refresh rate, inspect connection diagnostics, set idle alerts, and view recent GPU history.
 
-## 终端启动
+The terminal interface uses Python curses and follows the compact layout of nvitop -m full: GPUs above, the shared process table below, and colored utilization bars. It refreshes every 2 seconds by default and supports intervals as short as 0.25 seconds. Each GPU row is colored by the higher load level of GPU utilization (10% / 75%) and VRAM utilization (10% / 80%); the GPU and MEM bars use their own metrics.
 
-需要 Python 3.9 或更新版本，以及 macOS/Linux 自带的 OpenSSH。没有第三方 Python 依赖。
+## Terminal Quick Start
 
-在本目录打开终端并运行：
+Requirements: Python 3.9 or newer and OpenSSH (included with macOS and most Linux distributions). No third-party Python packages are needed.
+
+From the repository root, run:
 
     python3 gpu_watch.py
 
-## macOS 图形应用
-
-应用包位于 `dist/GPU Fleet Monitor.app`，压缩包位于 `dist/GPU Fleet Monitor.zip`。主界面采用紧凑服务器列表和原生玻璃按钮，支持浅色与深色外观。
-
-- 点击服务器或铅笔打开编辑面板；保存时校验 SSH 连接格式，取消不会改变配置。
-- 按名称或地址搜索，勾选需要汇总的服务器。单台菜单支持单独启动、复制连接、创建副本、排序和移除；移除后可撤销。
-- 一键选择 0.25 / 0.5 / 1 / 2 / 5 秒刷新，也可自定义 0.25–60 秒。
-- 顶部更多菜单支持导入服务器、导出 JSON 配置、复制监控命令、批量选择和补充内置服务器。导入会合并服务器并跳过重复连接，保留当前刷新设置。
-- 点击“启动监控”（⌘↩）打开新的 Terminal 窗口并运行内置脚本；⌘N 添加服务器。
-- 标题栏趋势按钮打开连接诊断、空闲提醒和历史曲线。诊断显示 SSH 采集结果、响应耗时、重连状态与错误详情；点击服务器行可查看原因。
-- 空闲提醒可选 5% / 10% / 20% GPU 阈值和持续 30 秒 / 1 分钟 / 5 分钟；只在没有运行进程且 GPU 利用率低于阈值时提醒。首次开启需允许 macOS 通知。
-- 近 30 分钟曲线显示 GPU 利用率、显存占用率和温度，每 5 秒采样一次。终端监控持续写入本机私有遥测文件，GUI 从该文件更新诊断、曲线和提醒，不额外发起 SSH 轮询；首次打开面板前先启动监控。
-
-设置自动保存在 `~/Library/Application Support/GPU Fleet Monitor/`。服务器配置、实时遥测和历史曲线保存在本机；公开源代码仅带有保留域名 `.example.invalid` 示例地址。连接格式校验在本地完成；真实连接状态由终端监控采集。应用会寻找 Homebrew、PATH 或系统中的 Python 3，并让校验与启动使用同一解释器。
-
-本机重新构建：
-
-    zsh mac-app/build_app.sh
-
-当前应用包面向 Apple Silicon，最低支持 macOS 13。
-
-键盘操作：
-
-- q：退出
-- r：立即刷新
-- Space：暂停或恢复自动刷新
-- ↑/↓ 或 j/k：默认直接选择进程，选中行反白显示；Tab 切换到 GPU 列表滚动
-- 鼠标单击进程行：选中并高亮；双击进程行：打开详情
-- Home/End：跳到当前焦点的首项/末项
-- [ / ]：滚动底部进程表；进程表会尽量利用终端高度，能放下时一次显示全部进程
-- f：按服务器、GPU、PID、用户或命令筛选进程；输入空字符串清除筛选
-- o 后输入排序键：n/N 按 GPU，u/U 按用户，p/P 按 PID，g/G 按 GPU 显存，s/S 按 %SM，c/C 按 %CPU，m/M 按 %MEM，t/T 按运行时间排序
-- , / .：选择相邻排序列；/：反转当前排序方向
-- Enter：查看所选进程详情，包括所在服务器、GPU 编号/型号/UUID/PCI 地址、GPU 状态和最近采样曲线
-- h 或 ?：查看快捷键帮助；Esc 返回/清除筛选
-- PageUp/PageDown：按当前焦点翻页
-
-只打印一次快照、不进入交互界面：
+Print a single snapshot without opening the interactive interface:
 
     python3 gpu_watch.py --once
 
-添加自定义服务器；传入 --server 后将使用传入的服务器列表：
+Pass one or more custom servers. When --server is provided, it replaces the bundled server list:
 
     python3 gpu_watch.py --server "A100=ssh -p 2222 user@example.com" --server "RTX=gpu01.example.invalid:22"
 
-## 连接服务器
+## macOS GUI
 
-终端脚本预填三个保留域名示例连接，实际监控前请替换成自己的服务器。连接格式支持：
+Build the app locally:
+
+    zsh mac-app/build_app.sh
+
+The app targets Apple Silicon and macOS 13 or newer. It uses a compact host list with native-style controls and supports light and dark appearance.
+
+- Click a server row or its pencil button to edit it. The app validates SSH connection syntax when saving; canceling leaves the configuration unchanged.
+- Search by name or address and choose which servers to monitor. Each server menu supports launching one host, copying a connection, duplicating, reordering, and removing with undo.
+- Choose a refresh interval of 0.25, 0.5, 1, 2, or 5 seconds, or set a custom value from 0.25 to 60 seconds.
+- The More menu supports importing and exporting JSON configuration, copying the monitor command, selecting servers in bulk, and restoring bundled examples. Imports merge hosts, skip duplicate connections, and preserve the current refresh interval.
+- Click **Start Monitoring** (⌘↩) to open a new Terminal window and run the bundled monitor. Press ⌘N to add a server.
+- The trends button opens connection diagnostics, idle alerts, and history. Diagnostics show collection status, response time, reconnect state, and error details; click a server row to inspect its issue.
+- Idle alerts support GPU utilization thresholds of 5%, 10%, or 20%, sustained for 30 seconds, 1 minute, or 5 minutes. An alert is raised only when there are no running processes and utilization stays below the selected threshold. macOS notifications must be allowed the first time.
+- The 30-minute charts show GPU utilization, VRAM utilization, and temperature, sampled every 5 seconds. The terminal monitor writes telemetry to a local private file; the GUI reads it for diagnostics, charts, and alerts without starting another SSH polling loop. Start the terminal monitor before opening these panels.
+
+Settings are stored in ~/Library/Application Support/GPU Fleet Monitor/. Server configuration, live telemetry, and history stay on the Mac. The public source includes only reserved .example.invalid placeholder hosts. Connection syntax is validated locally; live connection status comes from the terminal monitor. The app looks for Python 3 in Homebrew, PATH, or the system and uses the same interpreter for validation and launch.
+
+The app is ad-hoc signed. On first launch, macOS may require Control-clicking the app and choosing **Open**.
+
+## Keyboard Controls
+
+- **q:** quit
+- **r:** refresh immediately
+- **Space:** pause or resume automatic refresh
+- **↑ / ↓ or j / k:** select processes by default; the selected row is highlighted. Press **Tab** to switch focus to the GPU list.
+- Click a process row to select it; double-click to open details.
+- **Home / End:** jump to the first or last item in the focused list.
+- **[ / ]:** scroll the process table. It uses as much terminal height as possible and shows all processes when they fit.
+- **f:** filter by server, GPU, PID, user, or command. Submit an empty filter to clear it.
+- **o** followed by a key: sort by GPU (**n/N**), user (**u/U**), PID (**p/P**), GPU memory (**g/G**), %SM (**s/S**), %CPU (**c/C**), %MEM (**m/M**), or runtime (**t/T**).
+- **, / .:** select the previous or next sort column; **/** reverses the sort direction.
+- **Enter:** inspect the selected process, including its server, GPU ID/model/UUID/PCI address, GPU status, and recent samples.
+- **h** or **?:** show help; **Esc:** go back or clear the filter.
+- **PageUp / PageDown:** page through the focused list.
+
+## SSH Connections
+
+The terminal script includes three reserved placeholder hosts. Replace them before monitoring real servers. Supported formats include:
 
     ssh -p 2222 user@example.com
     gpu01.example.invalid:22
     user@host:port
 
-host:port 会沿用本机 SSH 配置中的默认用户名和密钥。脚本使用 BatchMode SSH，不会询问或保存密码；请确保系统 SSH 密钥或 ssh-agent 已能登录这些服务器，并在普通终端中先确认过主机指纹。
+The host:port format uses the default username and keys from your local SSH configuration. The script uses SSH BatchMode: it will not prompt for or store passwords. Make sure your SSH key or agent can access the servers, and accept each host fingerprint in a regular terminal first.
 
-远端能通过 python3 导入 nvitop 时，脚本调用 nvitop 的 Python API，读取 GPU 与进程信息。远端没有 nvitop 时，会自动回退到 nvidia-smi 的结构化查询，并在服务器标题上标出数据来源；回退模式会额外用 nvidia-smi pmon 读取进程 GPU 利用率，并通过 ps 查询进程所属用户、CPU、主机内存和运行时间。驱动或权限不支持的字段显示为短横线。
+If remote Python can import nvitop, the monitor uses its Python API for GPU and process data. Otherwise, it falls back to structured nvidia-smi queries and marks the source in the server header. In fallback mode, nvidia-smi pmon supplies per-process GPU utilization and ps supplies process owner, CPU, host memory, and runtime. Unsupported driver or permission fields are shown as dashes.
 
-## 采集范围
+SSH timeouts appear in the corresponding server group. For unknown host fingerprints or authentication failures, fix SSH access in a regular terminal first.
 
-终端界面显示 GPU 型号、GPU 利用率与进度条、显存使用量与进度条、温度、风扇、功耗、驱动版本，以及统一进程表中的服务器、GPU 编号、PID、命令、用户、GPU 显存、GPU SM、CPU、主机内存百分比和运行时间。Enter 打开的单进程详情会显示该进程对应 GPU 的型号、UUID、PCI 地址、负载、显存、温度、功耗和最近 60 次采样曲线。当前 SSH 登录账号的进程根据 UID 对齐并高亮，其他账号整行灰显。它只读取状态，不会启动、停止或修改服务器上的进程。
+## Data and Privacy
 
-SSH 连接超时会显示在对应服务器分组中；未知主机指纹或认证失败时，请先在普通终端修好 SSH 登录。可选的网页版本仍可用 python3 app.py 启动。
+The dashboard shows GPU model, utilization, VRAM, temperature, fan, power, and driver version. Its unified process table includes server, GPU ID, PID, command, user, GPU memory, GPU SM, CPU, host-memory percentage, and runtime. Process details include GPU model, UUID, PCI address, utilization, memory, temperature, power, and the latest 60 samples.
+
+The current SSH account's processes are matched by UID and highlighted; other accounts are dimmed. The monitor is read-only: it does not start, stop, or modify server processes.
+
+An optional web interface is also available:
+
+    python3 app.py
