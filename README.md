@@ -43,7 +43,7 @@ Pass one or more custom servers. When --server is provided, it replaces the bund
 
 ## macOS GUI
 
-Build the app locally:
+Download the prebuilt Apple Silicon app from the [latest GitHub Release](https://github.com/Nickory/GPU-Fleet-Monitor/releases/latest). To build it locally:
 
     zsh mac-app/build_app.sh
 
